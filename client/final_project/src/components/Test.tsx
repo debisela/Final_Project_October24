@@ -17,7 +17,7 @@ const Test = (props:any)=>{
             }, [])
     const all = async():Promise<void>=>{
                 try {
-                    const response = await axios.get<Attendee[]>('http://localhost:3200/attendees')
+                    const response = await axios.get<Attendee[]>('http://localhost:3200/api/attendees')
                     if(response.status === 200){
                         setUsers(response.data);
     

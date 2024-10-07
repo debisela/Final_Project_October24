@@ -1,3 +1,4 @@
+const { table } = require('console');
 const knex = require('knex')
 require('dotenv').config()
 
@@ -16,3 +17,4 @@ module.exports = {
         }
     })
 }
+
