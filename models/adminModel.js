@@ -50,11 +50,13 @@ const getFields = async()=>{
     .select('column_name')
 }
 
-// const saveTagFields = async(selectedFields)=>{
-//     await db('tag_settings').update
-// }
+//update tag_settings table, set to true shown_column for all fields selected
+const saveTagFields = async(selectedFields)=>{
+for (const item of selectedFields){
+    await db('tag_settings')
+    .update({show_column:true})
+    .where('column_name',item.column_name)
+}
+}
 
-
-
-
-module.exports = {getFields}
+module.exports = {getFields, saveTagFields}
