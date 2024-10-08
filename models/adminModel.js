@@ -11,8 +11,9 @@ const createTagSettingsTable = async() =>{
                 table.increments('id').primary();
                 table.string('column_name').notNullable();
                 table.boolean('show_column').defaultTo(false);
+                table.string('font_type');
                 table.string('font_color');
-                table.string('background_color');
+                table.string('font_size');
                 table.string('criteria');
             });
             console.log('tag_settings table created'); 
@@ -59,4 +60,26 @@ for (const item of selectedFields){
 }
 }
 
-module.exports = {getFields, saveTagFields}
+//update tag_settings table with chosen font
+const updateFontType = async(fontType)=>{
+    await db('tag_settings')
+    .update({font_type:fontType})
+    .where('show_column',true)
+}
+
+//update font-color for specific selected fields
+const updateColorSize = async(updateFields)=>{
+    for (const item of updateFields){
+        await db('tag_settings')
+        .update({
+        font_color:item.font_color,
+        font_size:item.font_size
+    })
+        .where('column_name',item.column_name)
+        .andWhere('show_column',true)
+    }
+    }
+
+module.exports = {getFields, saveTagFields, updateFontType, updateColorSize}
+
+

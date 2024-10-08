@@ -1,4 +1,4 @@
-const {getFields, saveTagFields} = require('../models/adminModel')
+const {getFields, saveTagFields, updateFontType, updateColorSize} = require('../models/adminModel')
 
 const _getFields = async(req, res)=>{
     try {
@@ -6,7 +6,7 @@ const _getFields = async(req, res)=>{
         res.status(200).json(fields);
     } catch (error) {
         console.log(error);
-        res.status(404).json({msg:'something wrong'})
+        res.status(404).json({msg:'error fetching fields'})
     }
 }
 
@@ -22,8 +22,39 @@ try {
     
 } catch (error) {
     console.log(error);
-    res.status(404).json({msg:'cant find tagfields'})
+    res.status(404).json({msg:'error updating tag fields'})
 }
 }
 
-module.exports={_getFields, _saveTagFields}
+const _updateFontType = async(req, res)=>{
+
+    try {
+        const {fontType} = req.body;
+        console.log(req.body);
+        
+        await updateFontType(fontType);
+        res.status(200).json({msg:'font-type updated successfully'})
+        
+    } catch (error) {
+        console.log(error);
+        res.status(404).json({msg:'error updating font-type'})
+    }
+    }
+
+
+const _updateColorSize = async(req, res)=>{
+
+        try {
+            const {updateFields} = req.body;
+            console.log(req.body);
+            
+            await updateColorSize(updateFields);
+            res.status(200).json({msg:'font-color and size updated successfully'})
+            
+        } catch (error) {
+            console.log(error);
+            res.status(404).json({msg:'error updating font-color and size'})
+        }
+        }
+
+module.exports={_getFields, _saveTagFields, _updateFontType,_updateColorSize}
