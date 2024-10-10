@@ -2,7 +2,8 @@ const {searchAttendee} = require('../models/userModel')
 
 const _searchAttendee = async (req, res) =>{
     const query = req.query.query;
-
+    // console.log(req.query);
+    
     try {
         const attendees = await searchAttendee(query);
         res.status(200).json(attendees);
