@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { query } from "express";
-import { stat } from "fs";
+
 
 interface Attendee {
     id: number;

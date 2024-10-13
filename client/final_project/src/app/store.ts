@@ -1,5 +1,5 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import attendeeReducer from '../features/Search/state/searchSlice.ts
+import attendeeReducer from '../features/Search/state/searchSlice.ts'
 
 const reducer = combineReducers({attendeeReducer})
 
