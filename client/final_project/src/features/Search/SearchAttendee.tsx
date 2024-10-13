@@ -1,104 +1,67 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-
-interface Attendee {
-  id: number;
-  first_name: string;
-  last_name: string;
-  title: string;
-  company: string;
-  email: string;
-  phone: string;
-}
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { fetchAttendees, resetAttendees } from "./state/searchSlice";
+import { useAttendeeSelector, useAttendeeStatus } from "./state/hooks";
 
 const SearchAttendee: React.FC = () => {
-  const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [query, setQuery] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const attendees = useAttendeeSelector()
+  const status = useAttendeeStatus()
+  const dispatch = useDispatch()
 
-  // Debounce state for delayed search requests
-  const [debouncedQuery, setDebouncedQuery] = useState<string>("");
-
-  // Debounce Effect
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 500); // Waits for 500ms of inactivity before triggering search
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [query]);
-
-  // Fetch attendees based on the debounced query
-  const fetchAttendees = async () => {
-    if (!debouncedQuery) return; // Skip if query is empty
-    setLoading(true);
-    setError(null); // Clear previous error message
-
-    try {
-      const response = await axios.get(
-        `http://localhost:3200/api/user/attendees?query=${debouncedQuery}`
-      );
-
-      if (response.status === 200) {
-        setAttendees(response.data);
-      } else {
-        setError("No attendees found.");
-        setAttendees([]);
-      }
-    } catch (err) {
-      setError("Failed to fetch attendees.");
-      console.error(err);
-    } finally {
-      setLoading(false);
+  const handleSearch = ()=>{
+    if (query.trim()===""){
+      dispatch(resetAttendees())
+      return
     }
-  };
+    dispatch(fetchAttendees(query))
+  }
 
-  // Trigger fetch whenever debouncedQuery changes
-  useEffect(() => {
-    if (debouncedQuery.length > 0) {
-      fetchAttendees();
-    } else {
-      setAttendees([]);
-    }
-  }, [debouncedQuery]);
+  // useEffect(()=>{
+  //   dispatch(fetchAttendees())
+  // },[dispatch])
 
-  return (
-    <div>
-      <h1>Search Attendees</h1>
-      <input
+  if (status === 'loading') return <h2>Loading...</h2>
+  if (status === 'failed') return <h2>Can't get attendee...</h2>
+ 
+    return(
+        <>
+        <h2>Attendees</h2>
+        <div>
+        <input
         type="text"
         placeholder="Enter last name"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-
-      {/* Display loading message */}
-      {loading && <p>Loading...</p>}
-
-      {/* Error message handling */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* Display attendees list or messages */}
-      {!loading && attendees.length > 0 ? (
-        <ul>
-          {attendees.map((attendee) => (
-            <li key={attendee.id}>
-              {attendee.last_name}, {attendee.first_name} - {attendee.email}
-            </li>
-          ))}
-        </ul>
+      <button onClick={handleSearch}>Search</button>
+        </div>
+        {attendees.length > 0 ? (
+        attendees.map((attendee:any) => {
+          return (
+            <div key={attendee.id}>
+              <h3>
+                {attendee.last_name}, {attendee.first_name}
+                <button>check-in
+              </button>
+              <button>
+                Print Tag
+              </button>
+              </h3>
+            </div>
+          );
+        })
       ) : (
-        !loading &&
-        debouncedQuery.length > 0 && <p>No attendees found</p>
+        <p>No attendees found.</p>
       )}
-
-      {/* Prompt for typing when search field is empty */}
-      {debouncedQuery.length === 0 && <p>Start typing to search attendees...</p>}
-    </div>
-  );
-};
-
+        </>
+    )
+}
 export default SearchAttendee;
+
+
+/* <button onClick={() => handleCheckIn(attendee)}>
+{attendee.checked_in ? "Check Out" : "Check In"}
+</button> */
+
+
