@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { query } from "express";
+import { stat } from "fs";
 
 interface Attendee {
     id: number;
@@ -18,27 +19,22 @@ interface Attendee {
 
 interface AttendeState{
     attendees: Attendee[];
-    loading: boolean;
-    message: string;
+    status: string;
 }
 
 const initialState: AttendeState = {
     attendees:[],
-    loading: false,
-    message: '',
+    status: "",
 }
 //async thung for search/fetch attendees
 export const fetchAttendees = createAsyncThunk(
     'attendees/fetchAttendees',
-    async(query:string)=>{
+    async(query:string, {rejectWithValue})=>{
         try {
             const response = await axios.get(`http://localhost:3200/api/user/attendees?query=${query}`);
             return response.data;
-        } catch (error) {
-            console.log(error);
-            return ("failed to fetch attendees")
-            
-            
+        } catch (error:any) {
+            return rejectWithValue(error.response.data)
         }
     }
 
@@ -47,27 +43,45 @@ export const fetchAttendees = createAsyncThunk(
 //asyn thunk for check in attendee
 export const toggleCheckIn = createAsyncThunk(
     'attendees/toggleCheckIn',
-    async(attendee:Attendee)=>{
+    async(attendee:Attendee, {rejectWithValue})=>{
         try {
-            const response = await axios.post(`http://localhost:3200/api/user/attendees/${attendee.id}/checkin`);
-            return response.data;
-        } catch (error) {
-            console.log(error);
-            return ("failed to fetch attendees")
-            
-            
+            const response = await axios.post(`http://localhost:3200/api/user/attendees/${attendee.id}/checkin`, {
+                checkedIn: !attendee.checked_in,
+            });
+            return {...attendee, checked_in:!attendee.checked_in};
+        } catch (error:any) {
+            return rejectWithValue(error.response.data)
         }
     }
-
 )
 
 export const searchSlice = createSlice({
     name: "attendee",
     initialState: initialState,
     reducers:{
-        //search attendee
-        searchAttendee:(state, action)=>{
-
+        //reset attendees
+        resetAttendees:(state)=>{
+            state.attendees = [];
         }
+    },
+    extraReducers(builder){
+        builder
+        .addCase(fetchAttendees.pending, state=>{
+            state.status = "loading";
+        })
+        .addCase(fetchAttendees.fulfilled, (state, action)=>{
+            state.status = "success";
+            state.attendees = action.payload
+        })
+        .addCase(fetchAttendees.rejected, state=>{
+            state.status = "failed"
+        })
     }
 })
+
+export const attendees = (state:any)=> state.attendeeReducer.attendees;
+export const status = (state:any)=> state.attendeeReducer.status
+export const state = (state:any) => state.attendeeReducer;
+
+export const {resetAttendees} = searchSlice.actions
+export default searchSlice.reducer;
