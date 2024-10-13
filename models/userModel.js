@@ -13,7 +13,7 @@ const columnNamesSelected = selectedFields.map(item => item.column_name);
 //return attendee
 const attendees = await db('attendees')
     .select(columnNamesSelected)
-    .where('last_name', 'ilike', `%${query}%`)
+    .where('last_name', 'ilike', `${query}%`)
 
 return attendees
 }
