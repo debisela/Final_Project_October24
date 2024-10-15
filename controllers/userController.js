@@ -1,4 +1,4 @@
-const {searchAttendee} = require('../models/userModel')
+const {searchAttendee, checkInAttendee} = require('../models/userModel')
 
 const _searchAttendee = async (req, res) =>{
     const query = req.query.query;
@@ -13,4 +13,17 @@ const _searchAttendee = async (req, res) =>{
     }
 }
 
-module.exports = {_searchAttendee}
+const _checkInAttendee = async (req, res)=>{
+    try{
+    const {id} = req.body;
+    await checkInAttendee(id);
+    res.status(200).json({msg:'attendee checked-in/out successfully'})
+} catch (error) {
+    console.log(error);
+    res.status(404).json({msg:'error toggle check-in'})
+}
+}
+
+
+
+module.exports = {_searchAttendee, _checkInAttendee}
