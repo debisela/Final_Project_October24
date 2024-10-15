@@ -1,3 +1,4 @@
+const { error } = require('console');
 const {db} = require('../config/db.js')
 
 //search attendee by name and get selected fields for attendee
@@ -18,4 +19,26 @@ const attendees = await db('attendees')
 return attendees
 }
 
-module.exports={searchAttendee}
+//checkin attendee
+const checkInAttendee = async(id)=>{
+    const attendee = await db('attendees')
+    .select('checked_in')
+    .where('id', id)
+    .first();
+
+    if(!attendee){
+        throw new Error ('Attendee not found');
+    }
+
+    const toggledStatus = !attendee.checked_in
+
+    await db('attendees')
+    .update({checked_in:toggledStatus, check_in_time:new Date()})
+    .where('id', id)
+
+    return await db('attendees')
+    .where('id', id)
+    .first()
+}
+
+module.exports={searchAttendee, checkInAttendee}
