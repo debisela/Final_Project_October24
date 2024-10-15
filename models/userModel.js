@@ -33,7 +33,7 @@ const checkInAttendee = async(id)=>{
     const toggledStatus = !attendee.checked_in
 
     await db('attendees')
-    .update({checked_in:toggledStatus})
+    .update({checked_in:toggledStatus, check_in_time:new Date()})
     .where('id', id)
 
     return await db('attendees')
