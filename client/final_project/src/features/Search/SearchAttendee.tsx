@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchAttendees, resetAttendees, toggleCheckIn } from "./state/searchSlice";
 import { useAttendeeSelector, useAttendeeStatus } from "./state/hooks";
+import {Attendee} from "./state/searchSlice"
 
 const SearchAttendee: React.FC = () => {
   const [query, setQuery] = useState<string>("");
@@ -17,8 +18,8 @@ const SearchAttendee: React.FC = () => {
     dispatch(fetchAttendees(query))
   }
 
-  const handleCheckIn = (id:number)=>{
-    dispatch(toggleCheckIn(id))
+  const handleCheckIn = (attendeeId:number)=>{
+    dispatch(toggleCheckIn(attendeeId))
   }
 
   // useEffect(()=>{
@@ -41,7 +42,7 @@ const SearchAttendee: React.FC = () => {
       <button onClick={handleSearch}>Search</button>
         </div>
         {attendees.length > 0 ? (
-        attendees.map((attendee:any) => {
+        attendees.map((attendee:Attendee) => {
           return (
             <div key={attendee.id}>
               <h3>

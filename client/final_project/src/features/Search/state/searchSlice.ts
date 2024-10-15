@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 
-interface Attendee {
+export interface Attendee {
     id: number;
     first_name: string;
     last_name: string;
@@ -42,12 +42,12 @@ export const fetchAttendees = createAsyncThunk(
 //asyn thunk for check in attendee
 export const toggleCheckIn = createAsyncThunk(
     'attendees/toggleCheckIn',
-    async(attendee:Attendee, {rejectWithValue})=>{
+    async(id:number, {rejectWithValue})=>{
         try {
-            const response = await axios.post(`http://localhost:3200/api/user/attendees/${attendee.id}/checkin`, {
-                checkedIn: !attendee.checked_in,
+            const response = await axios.post('http://localhost:3200/api/user/attendees/checkin', {
+                id: id,
             });
-            return {...attendee, checked_in:!attendee.checked_in};
+            return response.data;
         } catch (error:any) {
             return rejectWithValue(error.response.data)
         }
@@ -73,6 +73,25 @@ export const searchSlice = createSlice({
             state.attendees = action.payload
         })
         .addCase(fetchAttendees.rejected, state=>{
+            state.status = "failed"
+        })
+        builder
+        .addCase(toggleCheckIn.pending, state=>{
+            state.status = "loading";
+        })
+        .addCase(toggleCheckIn.fulfilled, (state,action)=>{
+            const updatedAttendee = action.payload;
+                const index = state.attendees.findIndex(att => att.id === updatedAttendee.id);
+                if (index !== -1) {
+                    state.attendees[index] = { 
+                        ...state.attendees[index], 
+                        checked_in: updatedAttendee.checked_in, 
+                        check_in_time: updatedAttendee.check_in_time 
+                    };
+                }
+            state.status = "success";
+        })
+        .addCase(toggleCheckIn.rejected, state=>{
             state.status = "failed"
         })
     }
