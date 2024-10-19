@@ -5,6 +5,8 @@ const _searchAttendee = async (req, res) =>{
 
     try {
         const attendees = await searchAttendee(query);
+        console.log("attendees from DB", attendees);
+        
         res.status(200).json(attendees);
         
     } catch (error) {
@@ -14,8 +16,10 @@ const _searchAttendee = async (req, res) =>{
 }
 
 const _checkInAttendee = async (req, res)=>{
-    try{
+    console.log("request body", req.body);
+    
     const {id} = req.body;
+    try{    
     await checkInAttendee(id);
     res.status(200).json({msg:'attendee checked-in/out successfully'})
 } catch (error) {

@@ -11,21 +11,21 @@ export interface Attendee {
     email: string;
     phone: string;
     checked_in: boolean;
-    check_in_time: Date;
+    check_in_time: Date | null;
     badge_printed: boolean;
     badge_type: string
   }
 
-interface AttendeState{
+interface AttendeeState{
     attendees: Attendee[];
     status: string;
 }
 
-const initialState: AttendeState = {
+const initialState: AttendeeState = {
     attendees:[],
     status: "",
 }
-//async thung for search/fetch attendees
+//async thunk for search/fetch attendees
 export const fetchAttendees = createAsyncThunk(
     'attendees/fetchAttendees',
     async(query:string, {rejectWithValue})=>{
@@ -44,11 +44,20 @@ export const toggleCheckIn = createAsyncThunk(
     'attendees/toggleCheckIn',
     async(id:number, {rejectWithValue})=>{
         try {
-            const response = await axios.post('http://localhost:3200/api/user/attendees/checkin', {
-                id: id,
-            });
+            console.log("id being passed", id);
+            const response = await axios.post('http://localhost:3200/api/user/attendees/checkin', 
+                {id},
+            {headers: {
+                'Content-Type': 'application/json'
+            }});
+            console.log("response data", response.data);
+            
             return response.data;
+            
+            
         } catch (error:any) {
+            console.log("error checking in");
+            
             return rejectWithValue(error.response.data)
         }
     }

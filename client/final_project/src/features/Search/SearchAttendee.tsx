@@ -4,6 +4,7 @@ import { fetchAttendees, resetAttendees, toggleCheckIn } from "./state/searchSli
 import { useAttendeeSelector, useAttendeeStatus } from "./state/hooks";
 import {Attendee} from "./state/searchSlice"
 
+
 const SearchAttendee: React.FC = () => {
   const [query, setQuery] = useState<string>("");
   const attendees = useAttendeeSelector()
@@ -16,15 +17,24 @@ const SearchAttendee: React.FC = () => {
       return
     }
     dispatch(fetchAttendees(query))
+
   }
 
-  const handleCheckIn = (attendeeId:number)=>{
-    dispatch(toggleCheckIn(attendeeId))
+  const handleCheckIn = async (attendeeId:number)=>{
+    console.log("id checkin", attendeeId);
+    
+    try {
+      await dispatch(toggleCheckIn(attendeeId)).unwrap();
+    } catch (error) {
+      console.log(error);
+      
+    }
+    
   }
 
-  // useEffect(()=>{
-  //   dispatch(fetchAttendees())
-  // },[dispatch])
+  useEffect(()=>{
+    console.log("Updated Attendees:", attendees);
+  },[attendees])
 
   if (status === 'loading') return <h2>Loading...</h2>
   if (status === 'failed') return <h2>Can't get attendee...</h2>
@@ -43,10 +53,12 @@ const SearchAttendee: React.FC = () => {
         </div>
         {attendees.length > 0 ? (
         attendees.map((attendee:Attendee) => {
+          console.log("Type of attendee.id:", typeof attendee.id);
+          
           return (
             <div key={attendee.id}>
               <h3>
-                {attendee.last_name}, {attendee.first_name}
+                {attendee.last_name}, {attendee.first_name}, {attendee.id}
                 <button onClick={() => handleCheckIn(attendee.id)}>
                   {attendee.checked_in ? "Check Out" : "Check In"}
                   </button> 
