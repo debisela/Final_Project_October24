@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 
-interface Attendee {
+export interface Attendee {
     id: number;
     first_name: string;
     last_name: string;
@@ -11,21 +11,21 @@ interface Attendee {
     email: string;
     phone: string;
     checked_in: boolean;
-    check_in_time: Date;
+    check_in_time: Date | null;
     badge_printed: boolean;
     badge_type: string
   }
 
-interface AttendeState{
+interface AttendeeState{
     attendees: Attendee[];
     status: string;
 }
 
-const initialState: AttendeState = {
+const initialState: AttendeeState = {
     attendees:[],
     status: "",
 }
-//async thung for search/fetch attendees
+//async thunk for search/fetch attendees
 export const fetchAttendees = createAsyncThunk(
     'attendees/fetchAttendees',
     async(query:string, {rejectWithValue})=>{
@@ -42,13 +42,22 @@ export const fetchAttendees = createAsyncThunk(
 //asyn thunk for check in attendee
 export const toggleCheckIn = createAsyncThunk(
     'attendees/toggleCheckIn',
-    async(attendee:Attendee, {rejectWithValue})=>{
+    async(id:number, {rejectWithValue})=>{
         try {
-            const response = await axios.post(`http://localhost:3200/api/user/attendees/${attendee.id}/checkin`, {
-                checkedIn: !attendee.checked_in,
-            });
-            return {...attendee, checked_in:!attendee.checked_in};
+            console.log("id being passed", id);
+            const response = await axios.post('http://localhost:3200/api/user/attendees/checkin', 
+                {id},
+            {headers: {
+                'Content-Type': 'application/json'
+            }});
+            console.log("response data", response.data);
+            
+            return response.data;
+            
+            
         } catch (error:any) {
+            console.log("error checking in");
+            
             return rejectWithValue(error.response.data)
         }
     }
@@ -73,6 +82,25 @@ export const searchSlice = createSlice({
             state.attendees = action.payload
         })
         .addCase(fetchAttendees.rejected, state=>{
+            state.status = "failed"
+        })
+        builder
+        .addCase(toggleCheckIn.pending, state=>{
+            state.status = "loading";
+        })
+        .addCase(toggleCheckIn.fulfilled, (state,action)=>{
+            const updatedAttendee = action.payload;
+                const index = state.attendees.findIndex(att => att.id === updatedAttendee.id);
+                if (index !== -1) {
+                    state.attendees[index] = { 
+                        ...state.attendees[index], 
+                        checked_in: updatedAttendee.checked_in, 
+                        check_in_time: updatedAttendee.check_in_time 
+                    };
+                }
+            state.status = "success";
+        })
+        .addCase(toggleCheckIn.rejected, state=>{
             state.status = "failed"
         })
     }

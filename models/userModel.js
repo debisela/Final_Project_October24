@@ -10,10 +10,12 @@ const searchAttendee = async(query)=>{
 
 //create array of selected fields column_names
 const columnNamesSelected = selectedFields.map(item => item.column_name);
+//add id to be always returned:
+const finalFields = ['id', 'checked_in', 'check_in_time', ...columnNamesSelected]
 
 //return attendee
 const attendees = await db('attendees')
-    .select(columnNamesSelected)
+    .select(finalFields)
     .where('last_name', 'ilike', `${query}%`)
 
 return attendees
@@ -21,6 +23,8 @@ return attendees
 
 //checkin attendee
 const checkInAttendee = async(id)=>{
+    console.log("id passed", id);
+    
     const attendee = await db('attendees')
     .select('checked_in')
     .where('id', id)
