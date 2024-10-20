@@ -4,6 +4,7 @@ import { fetchAttendees, resetAttendees, toggleCheckIn } from "./state/searchSli
 import { useAttendeeSelector, useAttendeeStatus } from "./state/hooks";
 import {Attendee} from "./state/searchSlice"
 import CheckInButton from "./CheckInButton";
+import PrintButton from "./PrintButton";
 
 
 const SearchAttendee: React.FC = () => {
@@ -49,9 +50,7 @@ const SearchAttendee: React.FC = () => {
               <h3>
                 {attendee.last_name}, {attendee.first_name}, {attendee.id}
                 <CheckInButton attendeeId={attendee.id} checkedIn={attendee.checked_in}/>
-              <button>
-                Print Tag
-              </button>
+              <PrintButton attendee={attendee}/>
               </h3>
             </div>
           );
