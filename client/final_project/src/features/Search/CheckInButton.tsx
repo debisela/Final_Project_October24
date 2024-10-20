@@ -23,7 +23,7 @@ interface CheckInToggleProps {
       return(
         <>
         <button onClick={handleCheckIn}>
-                  {checkedIn ? "Check Out" : "Check In"}
+                  {checkedIn ? "Check Out" : "Check In again"}
                   </button>
         </>
     )
