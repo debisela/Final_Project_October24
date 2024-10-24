@@ -1,23 +1,21 @@
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 
 const IntroPage = (props)=>{
-    const navigate = useNavigate();
-
-    const handleNavigateUser = ()=>{
-        navigate('/user')
-    }
-
-    const handleNavigateAdmin = ()=>{
-        navigate('/admin')
-    }
-
-
+    
     return(
         <>
-        <button onClick={handleNavigateUser}>User</button>
-        <button onClick={handleNavigateAdmin}>Admin</button>
+        <h1>Welcome</h1>
+        <div>
+            <Link to="/user">
+            <button>User</button>
+            </Link>
+        </div>
+        <div>
+            <Link to="/admin">
+            <button>Admin</button>
+            </Link>
+        </div>
         </>
     )
 }
